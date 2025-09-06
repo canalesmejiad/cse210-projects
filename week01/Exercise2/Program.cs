@@ -1,29 +1,29 @@
 using System;
 using Microsoft.VisualBasic;
 
-class Program
+internal class Program
 {
-    static void Main(string[] args)
+    private static void Main(string[] args)
     {
         Console.WriteLine("Enter a grade percentage:");
-        string input = Console.ReadLine();
-        int grade = int.Parse(input);
+        string grade = Console.ReadLine();
+        int percent = int.Parse(grade);
 
         string letter = "";
 
-        if (grade >= 90)
+        if (percent >= 90)
         {
             letter = "A";
         }
-        else if (grade >= 80)
+        else if (percent >= 80)
         {
             letter = "B";
         }
-        else if (grade >= 70)
+        else if (percent >= 70)
         {
             letter = "C";
         }
-        else if (grade >= 60)
+        else if (percent >= 60)
         {
             letter = "D";
         }
@@ -32,7 +32,7 @@ class Program
             letter = "F";
         }
         Console.WriteLine($"Your grade is {letter}");
-        if (grade >= 70)
+        if (percent >= 70)
         {
             Console.WriteLine("You passed!!!");
         }
@@ -42,4 +42,3 @@ class Program
         }
     }
 }
-
