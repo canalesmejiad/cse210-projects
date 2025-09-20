@@ -1,10 +1,10 @@
 using System;
-using System.Text;
 
 class Program
 {
     static void Main()
     {
+        // Ejemplo: Proverbios 3:5–6
         var reference = new Reference("Proverbs", 3, 5, 6);
         string text =
             "Trust in the Lord with all thine heart; and lean not unto thine own understanding. " +
@@ -12,60 +12,32 @@ class Program
 
         var scripture = new Scripture(reference, text);
 
-        var inputBuffer = new StringBuilder();
-
         while (true)
         {
             Console.Clear();
             Console.WriteLine(scripture.GetDisplayText());
             Console.WriteLine();
-            Console.WriteLine("[Space] hide words   |   Type 'exit' then [Enter] to quit");
-            if (inputBuffer.Length > 0)
+            Console.WriteLine(scripture.GetProgressLine(30));
+            Console.WriteLine();
+
+            if (scripture.AllWordsHidden)
             {
-                Console.WriteLine($"Input: {inputBuffer}");
+                Console.WriteLine("(All words are hidden. Program will end.)");
+                break;
             }
 
-            var key = Console.ReadKey(intercept: true);
+            Console.Write("Press SPACE (then Enter) to hide more words, or type 'exit' to quit: ");
+            var input = Console.ReadLine() ?? string.Empty;
 
-            if (key.Key == ConsoleKey.Spacebar)
+            if (input.Trim().Equals("exit", StringComparison.OrdinalIgnoreCase))
+                break;
+
+            // Si el usuario presiona espacios (o deja vacío), ocultamos más palabras
+            if (input.Length == 0 || string.IsNullOrWhiteSpace(input))
             {
-                scripture.HideRandomWords(2);
-
-                if (scripture.AllWordsHidden)
-                {
-                    Console.Clear();
-                    Console.WriteLine(scripture.GetDisplayText());
-                    Console.WriteLine("\n(All words are hidden. Program will end.)");
-                    break;
-                }
-
-                inputBuffer.Clear();
-                continue;
+                scripture.HideRandomWords(3); // oculta 3 palabras por ciclo
             }
-
-            if (key.Key == ConsoleKey.Enter)
-            {
-                var typed = inputBuffer.ToString().Trim();
-                if (typed.Equals("exit", StringComparison.OrdinalIgnoreCase))
-                {
-                    break;
-                }
-                inputBuffer.Clear();
-                continue;
-            }
-
-            if (key.Key == ConsoleKey.Backspace)
-            {
-                if (inputBuffer.Length > 0)
-                    inputBuffer.Remove(inputBuffer.Length - 1, 1);
-                continue;
-            }
-
-            // Agrega caracteres imprimibles al buffer (para poder escribir "exit")
-            if (!char.IsControl(key.KeyChar))
-            {
-                inputBuffer.Append(key.KeyChar);
-            }
+            // Cualquier otro texto se ignora y se vuelve a mostrar el pasaje
         }
     }
 }

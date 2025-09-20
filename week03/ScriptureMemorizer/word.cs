@@ -1,14 +1,11 @@
-using System;
-using System.Text;
-
 public class Word
 {
-    private readonly string _original;
+    private readonly string _text;
     private bool _hidden;
 
-    public Word(string token)
+    public Word(string text)
     {
-        _original = token;
+        _text = text;
         _hidden = false;
     }
 
@@ -16,20 +13,8 @@ public class Word
 
     public void Hide() => _hidden = true;
 
-    // Display original text or a version with letters replaced by underscores,
-    // preserving punctuation and spacing length.
     public string GetDisplayText()
     {
-        if (!_hidden) return _original;
-
-        var sb = new StringBuilder(_original.Length);
-        foreach (char c in _original)
-        {
-            if (char.IsLetter(c))
-                sb.Append('_');
-            else
-                sb.Append(c);
-        }
-        return sb.ToString();
+        return _hidden ? new string('_', _text.Length) : _text;
     }
 }

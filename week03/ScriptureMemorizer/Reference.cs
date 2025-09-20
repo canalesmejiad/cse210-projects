@@ -1,34 +1,33 @@
-using System;
-
 public class Reference
 {
-    public string Book { get; }
-    public int Chapter { get; }
-    public int VerseStart { get; }
-    public int? VerseEnd { get; }
+    private readonly string _book;
+    private readonly int _chapter;
+    private readonly int _startVerse;
+    private readonly int? _endVerse;
 
-    // Single-verse constructor  (e.g., "John 3:16")
     public Reference(string book, int chapter, int verse)
     {
-        Book = book;
-        Chapter = chapter;
-        VerseStart = verse;
-        VerseEnd = null;
+        _book = book;
+        _chapter = chapter;
+        _startVerse = verse;
+        _endVerse = null;
     }
 
-    // Range constructor (e.g., "Proverbs 3:5-6")
-    public Reference(string book, int chapter, int verseStart, int verseEnd)
+    public Reference(string book, int chapter, int startVerse, int endVerse)
     {
-        Book = book;
-        Chapter = chapter;
-        VerseStart = verseStart;
-        VerseEnd = verseEnd;
+        _book = book;
+        _chapter = chapter;
+        _startVerse = startVerse;
+        _endVerse = endVerse;
     }
 
-    public override string ToString()
+    public string GetDisplayText()
     {
-        if (VerseEnd.HasValue && VerseEnd.Value != VerseStart)
-            return $"{Book} {Chapter}:{VerseStart}-{VerseEnd.Value}";
-        return $"{Book} {Chapter}:{VerseStart}";
+        if (_endVerse.HasValue && _endVerse.Value != _startVerse)
+        {
+            return $"{_book} {_chapter}:{_startVerse}-{_endVerse.Value}";
+        }
+
+        return $"{_book} {_chapter}:{_startVerse}";
     }
 }
