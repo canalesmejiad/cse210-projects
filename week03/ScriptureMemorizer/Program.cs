@@ -19,7 +19,7 @@ class Program
             Console.WriteLine();
             Console.Write("Press Enter to hide words, or type 'quit' to end: ");
 
-            string? input = Console.ReadLine();
+            string input = Console.ReadLine();
             if (!string.IsNullOrWhiteSpace(input) &&
                 input.Trim().Equals("quit", StringComparison.OrdinalIgnoreCase))
             {
