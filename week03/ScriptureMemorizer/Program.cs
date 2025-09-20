@@ -1,10 +1,10 @@
 using System;
+using System.Text;
 
 class Program
 {
     static void Main()
     {
-        // Example scripture: Proverbs 3:5–6 (range)
         var reference = new Reference("Proverbs", 3, 5, 6);
         string text =
             "Trust in the Lord with all thine heart; and lean not unto thine own understanding. " +
@@ -12,29 +12,59 @@ class Program
 
         var scripture = new Scripture(reference, text);
 
+        var inputBuffer = new StringBuilder();
+
         while (true)
         {
             Console.Clear();
             Console.WriteLine(scripture.GetDisplayText());
             Console.WriteLine();
-            Console.Write("Press Enter to hide words, or type 'quit' to end: ");
-
-            string input = Console.ReadLine();
-            if (!string.IsNullOrWhiteSpace(input) &&
-                input.Trim().Equals("quit", StringComparison.OrdinalIgnoreCase))
+            Console.WriteLine("[Space] hide words   |   Type 'exit' then [Enter] to quit");
+            if (inputBuffer.Length > 0)
             {
-                break;
+                Console.WriteLine($"Input: {inputBuffer}");
             }
 
-            // Hide a few random words each cycle (e.g., 3)
-            scripture.HideRandomWords(3);
+            var key = Console.ReadKey(intercept: true);
 
-            if (scripture.AllWordsHidden)
+            if (key.Key == ConsoleKey.Spacebar)
             {
-                Console.Clear();
-                Console.WriteLine(scripture.GetDisplayText());
-                Console.WriteLine("\n(All words are hidden. Program will end.)");
-                break;
+                scripture.HideRandomWords(2);
+
+                if (scripture.AllWordsHidden)
+                {
+                    Console.Clear();
+                    Console.WriteLine(scripture.GetDisplayText());
+                    Console.WriteLine("\n(All words are hidden. Program will end.)");
+                    break;
+                }
+
+                inputBuffer.Clear();
+                continue;
+            }
+
+            if (key.Key == ConsoleKey.Enter)
+            {
+                var typed = inputBuffer.ToString().Trim();
+                if (typed.Equals("exit", StringComparison.OrdinalIgnoreCase))
+                {
+                    break;
+                }
+                inputBuffer.Clear();
+                continue;
+            }
+
+            if (key.Key == ConsoleKey.Backspace)
+            {
+                if (inputBuffer.Length > 0)
+                    inputBuffer.Remove(inputBuffer.Length - 1, 1);
+                continue;
+            }
+
+            // Agrega caracteres imprimibles al buffer (para poder escribir "exit")
+            if (!char.IsControl(key.KeyChar))
+            {
+                inputBuffer.Append(key.KeyChar);
             }
         }
     }
