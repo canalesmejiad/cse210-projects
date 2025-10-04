@@ -9,13 +9,6 @@
 //    that allows the user to write three things they are
 //    grateful for. This activity was not required but
 //    enhances mindfulness and reflection.
-// 2. Improved the Reflection Activity by randomizing
-//    the reflection questions and ensuring that no
-//    question is repeated until all have been shown.
-// 
-// These creative additions go beyond the core
-// specifications and demonstrate mastery of inheritance,
-// arrays/lists, and user experience design.
 // ============================================
 
 
