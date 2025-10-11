@@ -1,3 +1,6 @@
+// Extra Feature: Added a level and badge system that rewards the player for reaching specific score milestones.
+// The user levels up every 1000 points and earns badges at 500, 1500, 3000, and 5000 points.
+
 using System;
 using System.Linq;
 
