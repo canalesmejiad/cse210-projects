@@ -19,7 +19,6 @@ public class SimpleGoal : Goal
     public override string GetStatus()
         => $"{(_isComplete ? "[X]" : "[ ]")} {Name} ({Description})";
 
-
     public void SetComplete(bool value)
     {
         _isComplete = value;

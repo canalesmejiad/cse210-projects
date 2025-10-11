@@ -1,12 +1,16 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 public class GoalManager
 {
     public List<Goal> Goals { get; private set; } = new();
     public int TotalScore { get; private set; }
 
+    private readonly HashSet<string> _badges = new();
+    public int Level => 1 + (TotalScore / 1000);
+    public IEnumerable<string> Badges => _badges.OrderBy(b => b);
 
     private static int PromptInt(string label, int? min = null, int? max = null)
     {
@@ -34,7 +38,6 @@ public class GoalManager
         }
     }
 
-
     public void CreateGoal()
     {
         Console.WriteLine("Select type: 1.Simple 2.Eternal 3.Checklist");
@@ -49,23 +52,19 @@ public class GoalManager
             case "1":
                 Goals.Add(new SimpleGoal(name, desc, points));
                 break;
-
             case "2":
                 Goals.Add(new EternalGoal(name, desc, points));
                 break;
-
             case "3":
                 int target = PromptInt("Target count: ", min: 1);
                 int bonus = PromptInt("Bonus: ", min: 0);
                 Goals.Add(new ChecklistGoal(name, desc, points, target, bonus));
                 break;
-
             default:
                 Console.WriteLine("Invalid type");
                 break;
         }
     }
-
 
     public void ListGoals()
     {
@@ -79,7 +78,6 @@ public class GoalManager
             Console.WriteLine($"{i + 1}. {Goals[i].GetStatus()}");
     }
 
-
     public void RecordEvent()
     {
         if (Goals.Count == 0)
@@ -90,12 +88,13 @@ public class GoalManager
 
         ListGoals();
         int choice = PromptInt("Select goal #: ", min: 1, max: Goals.Count) - 1;
-
+        int beforeScore = TotalScore;
         int gained = Goals[choice].RecordEvent();
         TotalScore += gained;
         if (TotalScore < 0) TotalScore = 0;
 
         Console.WriteLine($"Points earned: {gained}. Total: {TotalScore}");
+        CheckGamification(beforeScore, true);
     }
 
     public void SaveGoals(string path = "goals.txt")
@@ -121,7 +120,6 @@ public class GoalManager
         }
     }
 
-    // ========= Cargar (robusto) =========
     public void LoadGoals(string path = "goals.txt")
     {
         if (!File.Exists(path))
@@ -139,78 +137,64 @@ public class GoalManager
                 return;
             }
 
-            // score
             if (!int.TryParse(lines[0].Trim(), out int score))
             {
                 Console.WriteLine("Invalid score in save file.");
                 return;
             }
             TotalScore = score;
-
             Goals.Clear();
 
             for (int i = 1; i < lines.Length; i++)
             {
                 var line = lines[i];
                 if (string.IsNullOrWhiteSpace(line)) continue;
-
                 string[] parts = line.Split('|');
                 string type = parts[0].Trim();
 
                 if (type == "Simple")
                 {
-                    if (parts.Length < 5) { WarnLine(i, "Simple expects 5 fields"); continue; }
-
-                    string name = parts[1].Trim();
-                    string desc = parts[2].Trim();
-
-                    if (!int.TryParse(parts[3].Trim(), out int pts)) { WarnLine(i, "Invalid points"); continue; }
-                    if (!bool.TryParse(parts[4].Trim(), out bool done)) { WarnLine(i, "Invalid complete flag"); continue; }
-
-                    var g = new SimpleGoal(name, desc, pts);
-                    g.SetComplete(done);                 // << usar método en vez de set directo
+                    var g = new SimpleGoal(parts[1], parts[2], int.Parse(parts[3]));
+                    g.SetComplete(bool.Parse(parts[4]));
                     Goals.Add(g);
                 }
                 else if (type == "Eternal")
                 {
-                    if (parts.Length < 4) { WarnLine(i, "Eternal expects 4 fields"); continue; }
-
-                    string name = parts[1].Trim();
-                    string desc = parts[2].Trim();
-                    if (!int.TryParse(parts[3].Trim(), out int pts)) { WarnLine(i, "Invalid points"); continue; }
-
-                    Goals.Add(new EternalGoal(name, desc, pts));
+                    Goals.Add(new EternalGoal(parts[1], parts[2], int.Parse(parts[3])));
                 }
                 else if (type == "Checklist")
                 {
-                    if (parts.Length < 7) { WarnLine(i, "Checklist expects 7 fields"); continue; }
-
-                    string name = parts[1].Trim();
-                    string desc = parts[2].Trim();
-
-                    if (!int.TryParse(parts[3].Trim(), out int pts)) { WarnLine(i, "Invalid points"); continue; }
-                    if (!int.TryParse(parts[4].Trim(), out int target)) { WarnLine(i, "Invalid target"); continue; }
-                    if (!int.TryParse(parts[5].Trim(), out int current)) { WarnLine(i, "Invalid current"); continue; }
-                    if (!int.TryParse(parts[6].Trim(), out int bonus)) { WarnLine(i, "Invalid bonus"); continue; }
-
-                    var g = new ChecklistGoal(name, desc, pts, target, bonus);
-                    g.SetCurrent(current);               // << usar método en vez de set directo
+                    var g = new ChecklistGoal(parts[1], parts[2],
+                        int.Parse(parts[3]), int.Parse(parts[4]), int.Parse(parts[6]));
+                    g.SetCurrent(int.Parse(parts[5]));
                     Goals.Add(g);
-                }
-                else
-                {
-                    WarnLine(i, $"Unknown type '{type}'");
                 }
             }
 
             Console.WriteLine($"Goals loaded from '{path}'.");
+            CheckGamification(TotalScore, false);
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Load failed: {ex.Message}");
         }
+    }
 
-        static void WarnLine(int lineNo, string msg) =>
-            Console.WriteLine($"Warning (line {lineNo + 1}): {msg}. Skipped.");
+    private void CheckGamification(int previousScore, bool announce)
+    {
+        int prevLevel = 1 + (previousScore / 1000);
+        if (announce && Level > prevLevel)
+            Console.WriteLine($"\n🎉 LEVEL UP! Now Level {Level}\n");
+
+        TryBadge(500, "Bronze Adventurer", announce);
+        TryBadge(1500, "Silver Seeker", announce);
+        TryBadge(3000, "Golden Voyager", announce);
+        TryBadge(5000, "Platinum Hero", announce);
+    }
+
+    private void TryBadge(int threshold, string name, bool announce)
+    {
+        if (TotalScore >= threshold && _badges.Add(name))
+            if (announce) Console.WriteLine($"🏅 New badge: {name}");
     }
 }
