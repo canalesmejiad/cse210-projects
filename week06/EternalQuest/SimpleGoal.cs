@@ -1,22 +1,27 @@
-class SimpleGoal : Goal
+public class SimpleGoal : Goal
 {
-    public bool IsComplete { get; set; }
+    private bool _isComplete;
+
     public SimpleGoal(string name, string desc, int points) : base(name, desc, points)
     {
-        IsComplete = false;
+        _isComplete = false;
     }
+
+    public override bool IsComplete => _isComplete;
+
     public override int RecordEvent()
     {
-        if (!IsComplete)
-        {
-            IsComplete = true;
-            return Points;
-        }
-        return 0;
+        if (_isComplete) return 0;
+        _isComplete = true;
+        return Points;
     }
+
     public override string GetStatus()
+        => $"{(_isComplete ? "[X]" : "[ ]")} {Name} ({Description})";
+
+
+    public void SetComplete(bool value)
     {
-        string box = IsComplete ? "[X]" : "[]";
-        return $"{box} {Name} ({Description})";
+        _isComplete = value;
     }
 }

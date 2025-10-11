@@ -1,25 +1,23 @@
-using System;
-using System.Buffers;
-
 class Program
 {
-    static void Main(string[] args)
+    static void Main()
     {
-        GoalManager manager = new GoalManager();
+        var manager = new GoalManager();
         bool running = true;
+
         while (running)
         {
-            Console.WriteLine("\n==== ETERNAL QUEST ====");
+            Console.WriteLine("\n=== Eternal Quest ===");
             Console.WriteLine($"Score: {manager.TotalScore}");
-            Console.WriteLine("1. Create Goal");
-            Console.WriteLine("2. List Goal");
-            Console.WriteLine("3. Record Event");
-            Console.WriteLine("4. Save Goals");
-            Console.WriteLine("5. Load Goals");
-            Console.WriteLine("0. Exit");
-            Console.WriteLine("Choose: ");
+            Console.WriteLine("1) Create Goal");
+            Console.WriteLine("2) List Goals");
+            Console.WriteLine("3) Record Event");
+            Console.WriteLine("4) Save Goals");
+            Console.WriteLine("5) Load Goals");
+            Console.WriteLine("0) Exit");
+            Console.Write("Choose: ");
 
-            switch (Console.ReadLine())
+            switch ((Console.ReadLine() ?? "").Trim())
             {
                 case "1": manager.CreateGoal(); break;
                 case "2": manager.ListGoals(); break;
@@ -29,7 +27,6 @@ class Program
                 case "0": running = false; break;
                 default: Console.WriteLine("Invalid."); break;
             }
-
         }
     }
 }

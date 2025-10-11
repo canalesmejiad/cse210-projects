@@ -1,17 +1,24 @@
-using System;
-
-abstract class Goal
+public abstract class Goal
 {
-    public string Name { get; set; }
-    public string Description { get; set; }
-    public int Points { get; set; }
 
-    public Goal(string name, string description, int points)
+    private string _name;
+    private string _description;
+    private int _points;
+
+    protected Goal(string name, string description, int points)
     {
-        Name = name;
-        Description = description;
-        Points = points;
+        _name = name;
+        _description = description;
+        _points = points;
     }
+
+
+    public string Name => _name;
+    public string Description => _description;
+    public int Points => _points;
+
+
     public abstract int RecordEvent();
     public abstract string GetStatus();
+    public virtual bool IsComplete => false;
 }
