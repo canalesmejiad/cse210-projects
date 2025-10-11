@@ -5,7 +5,7 @@ class Program
 {
     static void Main(string[] args)
     {
-        Console.OutputEncoding = System.Text.Enconding.UTF8;
+        GoalManager manager = new GoalManager();
         bool running = true;
         while (running)
         {
