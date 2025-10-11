@@ -1,4 +1,4 @@
-class CheckListGoal : Goal
+class ChecklistGoal : Goal
 {
     public int TargetCount { get; set; }
     public int CurrentCount { get; set; }
